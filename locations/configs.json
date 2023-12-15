@@ -1,0 +1,16 @@
+{
+  "public": {
+    "port": 8080,
+    "name": "locations"
+  },
+  "logger": {
+    "level": "debug",
+    "encoding": "console"
+  },
+  "worldTimeApi": {
+    "baseUrl": "http://worldtimeapi.org/"
+  },
+  "ipApi": {
+    "baseUrl": "http://ip-api.com"
+  }
+}

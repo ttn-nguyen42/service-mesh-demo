@@ -1,0 +1,14 @@
+{
+  "public": {
+    "port": 8082,
+    "name": "dashboard"
+  },
+  "logger": {
+    "level": "debug",
+    "encoding": "console"
+  },
+  "services": {
+    "weather": "http://localhost:8081",
+    "locations": "http://localhost:8080"
+  }
+}

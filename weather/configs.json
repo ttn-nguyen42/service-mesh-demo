@@ -1,0 +1,14 @@
+{
+  "public": {
+    "port": 8081,
+    "name": "weather"
+  },
+  "logger": {
+    "level": "debug",
+    "encoding": "console"
+  },
+  "owm": {
+    "apiKey": "bfcc6bc5a91d5c1ecee49497338b1ee5",
+    "baseUrl": "http://api.openweathermap.org"
+  }
+}
