@@ -9,7 +9,6 @@ import (
 	"path"
 	"sync"
 
-	_ "github.com/glebarez/go-sqlite"
 	"github.com/jmoiron/sqlx"
 	"gorm.io/gorm"
 )

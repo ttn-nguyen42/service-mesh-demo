@@ -5,6 +5,7 @@ import (
 	custerror "labs/service-mesh/helper/error"
 
 	"gorm.io/driver/sqlite"
+	_ "github.com/glebarez/go-sqlite"
 	"gorm.io/gorm"
 )
 

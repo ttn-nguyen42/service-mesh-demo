@@ -16,6 +16,9 @@ func GetDashboard(ctx *fiber.Ctx) error {
 	if len(ips) > 0 {
 		ip = ips[0]
 	}
+	if len(ip) == 0 {
+		ip = ctx.IP()
+	}
 	logger.SInfo("GetDashboard: GetIP",
 		zap.String("ip", ip))
 	if len(ip) == 0 {
