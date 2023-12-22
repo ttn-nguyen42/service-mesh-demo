@@ -675,7 +675,7 @@ server:
     loadBalancerSourceRanges: []
     servicePort: 80
     sessionAffinity: None
-    type: NodePort
+    type: ClusterIP
 
     ## Enable gRPC port on service to allow auto discovery with thanos-querier
     gRPC:
@@ -913,6 +913,9 @@ serverFiles:
         kubernetes_sd_configs:
           - role: endpoints
 
+        tls_config:
+          insecure_skip_verify: true
+
         relabel_configs:
           - source_labels:
               [__meta_kubernetes_service_annotation_prometheus_io_scrape]
@@ -979,6 +982,9 @@ serverFiles:
         kubernetes_sd_configs:
           - role: endpoints
 
+        tls_config:
+          insecure_skip_verify: true
+
         relabel_configs:
           - source_labels:
               [__meta_kubernetes_service_annotation_prometheus_io_scrape_slow]
@@ -1043,6 +1049,9 @@ serverFiles:
         params:
           module: [http_2xx]
 
+        tls_config:
+          insecure_skip_verify: true
+
         kubernetes_sd_configs:
           - role: service
 
@@ -1080,6 +1089,10 @@ serverFiles:
 
         kubernetes_sd_configs:
           - role: pod
+
+        tls_config:
+          insecure_skip_verify: true
+        bearer_token: 'b82833cd-c6d8-e624-ef8f-fb3792eda7d2'
 
         relabel_configs:
           - source_labels:
@@ -1151,6 +1164,8 @@ serverFiles:
 
         scrape_interval: 5m
         scrape_timeout: 30s
+        tls_config:
+          insecure_skip_verify: true
 
         kubernetes_sd_configs:
           - role: pod

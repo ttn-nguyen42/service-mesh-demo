@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: locations
+  namespace: demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: locations
+  namespace: demo
+spec:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+  selector:
+    app: locations
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locations
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: locations
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: enabled
+      labels:
+        app: locations
+    spec:
+      containers:
+        - image: nguyentrantrung/locations:latest
+          imagePullPolicy: Always
+          name: locations-container
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              memory: 125Mi
+              cpu: 100m
+          env:
+            - name: CONFIG_FILE_PATH
+              value: ./configs.json
+      serviceAccountName: locations

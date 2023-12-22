@@ -1,5 +1,3 @@
-# https://github.com/hashicorp/consul-k8s/tree/main/charts/consul
-
 # Copyright (c) HashiCorp, Inc.
 # SPDX-License-Identifier: MPL-2.0
 
@@ -68,7 +66,7 @@ global:
   # image: "hashicorp/consul-enterprise:1.10.0-ent"
   # ```
   # @default: hashicorp/consul:<latest version>
-  image: hashicorp/consul:1.17
+  image: docker.mirror.hashicorp.services/hashicorppreview/consul:1.18-dev
 
   # Array of objects containing image pull secret names that will be applied to each service account.
   # This can be used to reference image pull secrets if using a custom consul or consul-k8s-control-plane Docker image.
@@ -88,7 +86,7 @@ global:
   # image that is used for functionality such as catalog sync.
   # This can be overridden per component.
   # @default: hashicorp/consul-k8s-control-plane:<latest version>
-  imageK8S: hashicorp/consul-k8s-control-plane:1.3.0
+  imageK8S: docker.mirror.hashicorp.services/hashicorppreview/consul-k8s-control-plane:1.4-dev
 
   # The name of the datacenter that the agents should
   # register as. This can't be changed once the Consul cluster is up and running
@@ -329,13 +327,13 @@ global:
     # in the server certificate. This is useful when you need to access the
     # Consul server(s) externally, for example, if you're using the UI.
     # @type: array<string>
-    serverAdditionalDNSSANs: ['*.svc.cluster.local']
+    serverAdditionalDNSSANs: []
 
     # A list of additional IP addresses to set as Subject Alternative Names (SANs)
     # in the server certificate. This is useful when you need to access the
     # Consul server(s) externally, for example, if you're using the UI.
     # @type: array<string>
-    serverAdditionalIPSANs: ['*']
+    serverAdditionalIPSANs: []
 
     # If true, `verify_outgoing`, `verify_server_hostname`,
     # and `verify_incoming` for internal RPC communication will be set to `true` for Consul servers and clients.
@@ -434,10 +432,10 @@ global:
     bootstrapToken:
       # The name of the Kubernetes or Vault secret that holds the bootstrap token.
       # If unset, this defaults to `{{ global.name }}-bootstrap-acl-token`.
-      secretName: ''
+      secretName: null
       # The key within the Kubernetes or Vault secret that holds the bootstrap token.
       # If unset, this defaults to `token`.
-      secretKey: ''
+      secretKey: null
 
     # If true, an ACL token will be created that can be used in secondary
     # datacenters for replication. This should only be set to true in the
@@ -636,12 +634,12 @@ global:
     # Configures the Helm chart’s components to forward envoy metrics for the Consul service mesh to the
     # consul-telemetry-collector. This includes gateway metrics and sidecar metrics.
     # @type: boolean
-    enableTelemetryCollector: true
+    enableTelemetryCollector: false
 
   # The name (and tag) of the consul-dataplane Docker image used for the
   # connect-injected sidecar proxies and mesh, terminating, and ingress gateways.
   # @default: hashicorp/consul-dataplane:<latest supported version>
-  imageConsulDataplane: hashicorp/consul-dataplane:1.3.0
+  imageConsulDataplane: docker.mirror.hashicorp.services/hashicorppreview/consul-dataplane:1.4-dev
 
   # Configuration for running this Helm chart on the Red Hat OpenShift platform.
   # This Helm chart currently supports OpenShift v4.x+.
@@ -663,7 +661,7 @@ global:
     #
     # Note: this setting should not be enabled for [HashiCorp-managed clusters](https://developer.hashicorp.com/hcp/docs/consul/hcp-managed).
     # It is strictly for linking self-managed clusters.
-    enabled: true
+    enabled: false
 
     # The resource id of the HCP Consul Central cluster to link to. Eg:
     # organization/27109cd4-a309-4bf3-9986-e1d071914b18/project/fcef6c24-259d-4510-bb8d-1d812e120e34/hashicorp.consul.global-network-manager.cluster/consul-cluster
@@ -671,10 +669,10 @@ global:
     resourceId:
       # The name of the Kubernetes secret that holds the resource id.
       # @type: string
-      secretName: ''
+      secretName: null
       # The key within the Kubernetes secret that holds the resource id.
       # @type: string
-      secretKey: ''
+      secretKey: null
 
     # The client id portion of a [service principal](https://developer.hashicorp.com/hcp/docs/hcp/admin/iam/service-principals#service-principals) with authorization to link the cluster
     # in global.cloud.resourceId to HCP Consul Central.
@@ -682,10 +680,10 @@ global:
     clientId:
       # The name of the Kubernetes secret that holds the client id.
       # @type: string
-      secretName: ''
+      secretName: null
       # The key within the Kubernetes secret that holds the client id.
       # @type: string
-      secretKey: ''
+      secretKey: null
 
     # The client secret portion of a [service principal](https://developer.hashicorp.com/hcp/docs/hcp/admin/iam/service-principals#service-principals) with authorization to link the cluster
     # in global.cloud.resourceId to HCP Consul Central.
@@ -693,10 +691,10 @@ global:
     clientSecret:
       # The name of the Kubernetes secret that holds the client secret.
       # @type: string
-      secretName: ''
+      secretName: null
       # The key within the Kubernetes secret that holds the client secret.
       # @type: string
-      secretKey: ''
+      secretKey: null
 
     # The hostname of HCP's API. This setting is used for internal testing and validation.
     apiHost:
@@ -779,16 +777,16 @@ server:
   # within Kubernetes to join that cluster, this should probably be false.
   # @default: global.enabled
   # @type: boolean
-  enabled: true
+  enabled: '-'
 
   # Override global log verbosity level. One of "trace", "debug", "info", "warn", or "error".
   # @type: string
-  logLevel: 'debug'
+  logLevel: ''
 
   # The name of the Docker image (including any tag) for the containers running
   # Consul server agents.
   # @type: string
-  image: hashicorp/consul:1.17
+  image: null
 
   # The number of server agents to run. This determines the fault tolerance of
   # the cluster. Please refer to the [deployment table](https://developer.hashicorp.com/consul/docs/architecture/consensus#deployment-table)
@@ -803,7 +801,7 @@ server:
   # were joined into the same datacenter and each cluster ran a certain number
   # of servers.
   # @type: int
-  bootstrapExpect: null
+  bootstrapExpect: 1
 
   # A secret containing a certificate & key for the server agents to use
   # for TLS communication within the Consul cluster. Cert needs to be provided with
@@ -868,7 +866,7 @@ server:
   # servers' StatefulSet storage. For dynamically provisioned storage classes, this is the
   # desired size. For manually defined persistent volumes, this should be set to
   # the disk size of the attached volume.
-  storage: 3Gi
+  storage: 1Gi
 
   # The StorageClass to use for the servers' StatefulSet storage. It must be
   # able to be dynamically provisioned if you want the storage
@@ -1168,11 +1166,7 @@ server:
   # ```
   #
   # @type: string
-  annotations: |
-    "prometheus.io/scrape": "true"
-    "prometheus.io/path": "/metrics"
-    "prometheus.io/port": "8500"
-    "prometheus.io/scheme" : "http"
+  annotations: null
 
   # Configures a service to expose ports on the Consul servers over a Kubernetes Service.
   exposeService:
@@ -1725,7 +1719,7 @@ client:
 # https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#configure-stub-domain-and-upstream-dns-servers
 dns:
   # @type: boolean
-  enabled: false
+  enabled: '-'
 
   # If true, services using Consul service mesh will use Consul DNS
   # for default DNS resolution. The DNS lookups fall back to the nameserver IPs
@@ -1792,11 +1786,11 @@ ui:
     nodePort:
       # HTTP node port
       # @type: integer
-      http: 30100
+      http: null
 
       # HTTPS node port
       # @type: integer
-      https: 30101
+      https: null
 
     # Annotations to apply to the UI service.
     #
@@ -1883,7 +1877,7 @@ ui:
     # baseURL is the URL of the prometheus server, usually the service URL.
     # This value is only used if `ui.enabled` is set to true.
     # @type: string
-    baseURL: http://prometheus-server.prometheus.svc.cluster.local
+    baseURL: http://prometheus-server
 
   # Corresponds to [`dashboard_url_templates`](https://developer.hashicorp.com/consul/docs/agent/config/config-files#ui_config_dashboard_url_templates)
   # configuration.
@@ -1945,7 +1939,7 @@ syncCatalog:
   #
   # Note: `k8sDenyNamespaces` takes precedence over values defined here.
   # @type: array<string>
-  k8sAllowNamespaces: ['*']
+  k8sAllowNamespaces: ['consul', 'demo']
 
   # List of k8s namespaces that should not have their
   # services synced. This list takes precedence over `k8sAllowNamespaces`.
@@ -2237,7 +2231,7 @@ connectInject:
       tolerations: null
 
       # This value defines the type of Service created for gateways (e.g. LoadBalancer, ClusterIP)
-      serviceType: NodePort
+      serviceType: LoadBalancer
 
       # Configuration settings for annotations to be copied from the Gateway to other child resources.
       copyAnnotations:
@@ -2555,7 +2549,7 @@ connectInject:
   # `namespaceSelector` takes precedence over both since it is applied first.
   # `kube-system` and `kube-public` are never injected, even if included here.
   # @type: array<string>
-  k8sAllowNamespaces: ['demo', 'consul']
+  k8sAllowNamespaces: ['consul', 'demo']
 
   # List of k8s namespaces that should not allow Connect
   # sidecar injection. This list takes precedence over `k8sAllowNamespaces`.
@@ -2701,7 +2695,7 @@ connectInject:
       # @type: boolean
       defaultEnableShutdownDrainListeners: true
       # @type: integer
-      defaultShutdownGracePeriodSeconds: 5
+      defaultShutdownGracePeriodSeconds: 30
       # @type: integer
       defaultGracefulPort: 20600
       # @type: string
@@ -2785,7 +2779,7 @@ meshGateway:
   # The service option configures the Service that fronts the Gateway Deployment.
   service:
     # Type of service, ex. LoadBalancer, ClusterIP.
-    type: NodePort
+    type: LoadBalancer
 
     # Port that the service will be exposed on.
     # The targetPort will be set to meshGateway.containerPort.
@@ -3304,7 +3298,7 @@ apiGateway:
     tolerations: null
 
     # This value defines the type of service created for gateways (e.g. LoadBalancer, ClusterIP)
-    serviceType: NodePort
+    serviceType: LoadBalancer
 
     # This value toggles if the gateway ports should be mapped to host ports
     useHostPorts: false
@@ -3452,7 +3446,7 @@ webhookCertManager:
 prometheus:
   # When true, the Helm chart will install a demo Prometheus server instance
   # alongside Consul.
-  enabled: false
+  enabled: true
 
 # Control whether a test Pod manifest is generated when running helm template.
 # When using helm install, the test Pod is not submitted to the cluster so this
@@ -3479,11 +3473,11 @@ telemetryCollector:
   # @type: map
   resources:
     requests:
-      memory: '256Mi'
-      cpu: '250m'
+      memory: '512Mi'
+      cpu: '1000m'
     limits:
-      memory: '256Mi'
-      cpu: '250m'
+      memory: '512Mi'
+      cpu: '1000m'
 
   # This value sets the number of consul-telemetry-collector replicas to deploy.
   replicas: 1
@@ -3538,10 +3532,10 @@ telemetryCollector:
     resourceId:
       # The name of the Kubernetes secret that holds the resource id.
       # @type: string
-      secretName: ''
+      secretName: null
       # The key within the Kubernetes secret that holds the resource id.
       # @type: string
-      secretKey: ''
+      secretKey: null
 
     # The client id portion of a [service principal](https://developer.hashicorp.com/hcp/docs/hcp/admin/iam/service-principals#service-principals) with authorization to push metrics to HCP
     #
@@ -3553,10 +3547,10 @@ telemetryCollector:
     clientId:
       # The name of the Kubernetes secret that holds the client id.
       # @type: string
-      secretName: consul-hcp-obs-client-id
+      secretName: null
       # The key within the Kubernetes secret that holds the client id.
       # @type: string
-      secretKey: client-id
+      secretKey: null
 
     # The client secret portion of a [service principal](https://developer.hashicorp.com/hcp/docs/hcp/admin/iam/service-principals#service-principals) with authorization to push metrics to HCP.
     #
@@ -3568,10 +3562,10 @@ telemetryCollector:
     clientSecret:
       # The name of the Kubernetes secret that holds the client secret.
       # @type: string
-      secretName: consul-hcp-obs-client-secret
+      secretName: null
       # The key within the Kubernetes secret that holds the client secret.
       # @type: string
-      secretKey: client-secret
+      secretKey: null
 
   initContainer:
     # The resource settings for consul-telemetry-collector initContainer.

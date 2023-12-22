@@ -13,6 +13,7 @@ if minikube addons list | grep -q dashboard; then
     echo "Kubernetes dashboard is already installed."
 else
     echo "Installing Kubernetes dashboard..."
+    minikube addons enable metrics-server
     minikube addons enable dashboard
 fi
 
@@ -22,4 +23,4 @@ if ! kubectl config get-contexts | grep -q minikube; then
 fi
 
 echo "Start Kubernetes dashboard"
-minikube dashboard
+minikube dashboard --url &
