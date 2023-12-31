@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-minikube delete
-./scripts/minikube/start.sh
+minikube delete -p consul
+./scripts/minikube/start.sh consul
 
 # ./scripts/helm/prom.sh
 # ./scripts/helm/grafana.sh

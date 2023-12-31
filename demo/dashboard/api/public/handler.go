@@ -35,3 +35,4 @@ func GetDashboard(ctx *fiber.Ctx) error {
 
 	return ctx.JSON(resp)
 }
+

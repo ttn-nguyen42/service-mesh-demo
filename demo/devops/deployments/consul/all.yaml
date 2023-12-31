@@ -1,0 +1,215 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo
+  labels:
+    name: demo
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: locations
+  namespace: demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: locations
+  namespace: demo
+spec:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+  selector:
+    app: locations
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locations
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: locations
+  template:
+    metadata:
+      annotations:
+        consul.hashicorp.com/connect-inject: 'true'
+      labels:
+        app: locations
+    spec:
+      containers:
+        - image: nguyentrantrung/locations:latest
+          imagePullPolicy: Always
+          name: locations-container
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              memory: 125Mi
+              cpu: 100m
+          env:
+            - name: CONFIG_FILE_PATH
+              value: ./configs.json
+      serviceAccountName: locations
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: locations
+  namespace: demo
+spec:
+  protocol: http
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: weather
+  namespace: demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: weather
+  namespace: demo
+spec:
+  ports:
+    - name: http
+      port: 8081
+      protocol: TCP
+  selector:
+    app: weather
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weather
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: enabled
+      labels:
+        app: weather
+    spec:
+      containers:
+        - image: nguyentrantrung/weather:latest
+          imagePullPolicy: Always
+          name: weather-container
+          ports:
+            - containerPort: 8081
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              memory: 125Mi
+              cpu: 100m
+          env:
+            - name: CONFIG_FILE_PATH
+              value: ./configs.json
+      serviceAccountName: weather
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dashboard
+  namespace: demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashboard
+  namespace: demo
+spec:
+  ports:
+    - name: http
+      port: 8082
+      protocol: TCP
+  selector:
+    app: dashboard
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashboard
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashboard
+  template:
+    metadata:
+      annotations:
+        consul.hashicorp.com/connect-inject: 'true'
+      labels:
+        app: dashboard
+    spec:
+      containers:
+        - image: nguyentrantrung/dashboard:latest
+          imagePullPolicy: Always
+          name: dashboard-container
+          ports:
+            - containerPort: 8082
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              memory: 125Mi
+              cpu: 100m
+          env:
+            - name: CONFIG_FILE_PATH
+              value: ./configs.json
+      serviceAccountName: dashboard
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: demo-gateway
+  namespace: demo
+spec:
+  gatewayClassName: consul
+  listeners:
+    - protocol: HTTP
+      port: 80
+      name: http
+      allowedRoutes:
+        namespaces:
+          from: Same
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: dashboard-route
+  namespace: demo
+spec:
+  parentRefs:
+    - name: demo-gateway
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      backendRefs:
+        - name: dashboard
+          port: 8082
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: dashboard
+spec:
+  protocol: http

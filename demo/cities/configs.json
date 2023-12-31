@@ -1,0 +1,14 @@
+{
+  "public": {
+    "port": 8084,
+    "name": "locations"
+  },
+  "logger": {
+    "level": "debug",
+    "encoding": "console"
+  },
+  "citiesApi": {
+    "apiKey": "dWxLdTFOWE1sV1REcWNvTmxrNnJENHE1RnBRY0hMWGwwZEZFcTBLQg==",
+    "baseUrl": "https://api.countrystatecity.in"
+  }
+}

@@ -44,3 +44,18 @@ dashboard:
 	docker build -t $(TAG)/$(NAME):latest --platform linux/amd64 -f $(DOCKERFILE) . && \
 	rm -rf main $(DOCKERFILE)
 	docker push $(TAG)/$(NAME)
+
+cities: NAME=dashboard
+cities: TAG=nguyentrantrung
+cities: SOURCE_PATH="../dashboard"
+cities: HELPER_PATH="../helper"
+cities: DOCKERFILE=htmx.Dockerfile
+cities:
+	git pull
+	cp $(DOCKERFILE) $(SOURCE_PATH)
+	cd $(SOURCE_PATH) && \
+	go mod tidy && \
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o main main.go && \
+	docker build -t $(TAG)/$(NAME):latest --platform linux/amd64 -f $(DOCKERFILE) . && \
+	rm -rf main $(DOCKERFILE)
+	docker push $(TAG)/$(NAME)

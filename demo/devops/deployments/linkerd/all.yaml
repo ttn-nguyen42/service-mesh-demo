@@ -1,0 +1,169 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo
+  labels:
+    name: demo
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: locations
+  namespace: demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: locations
+  namespace: demo
+spec:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+  selector:
+    app: locations
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locations
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: locations
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: enabled
+      labels:
+        app: locations
+    spec:
+      containers:
+        - image: nguyentrantrung/locations:latest
+          imagePullPolicy: Always
+          name: locations-container
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              memory: 125Mi
+              cpu: 100m
+          env:
+            - name: CONFIG_FILE_PATH
+              value: ./configs.json
+      serviceAccountName: locations
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: weather
+  namespace: demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: weather
+  namespace: demo
+spec:
+  ports:
+    - name: http
+      port: 8081
+      protocol: TCP
+  selector:
+    app: weather
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weather
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: enabled
+      labels:
+        app: weather
+    spec:
+      containers:
+        - image: nguyentrantrung/weather:latest
+          imagePullPolicy: Always
+          name: weather-container
+          ports:
+            - containerPort: 8081
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              memory: 125Mi
+              cpu: 100m
+          env:
+            - name: CONFIG_FILE_PATH
+              value: ./configs.json
+      serviceAccountName: weather
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dashboard
+  namespace: demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashboard
+  namespace: demo
+spec:
+  ports:
+    - name: http
+      port: 8082
+      protocol: TCP
+      nodePort: 31100
+  selector:
+    app: dashboard
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashboard
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashboard
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: enabled
+      labels:
+        app: dashboard
+    spec:
+      containers:
+        - image: nguyentrantrung/dashboard:latest
+          imagePullPolicy: Always
+          name: dashboard-container
+          ports:
+            - containerPort: 8082
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              memory: 125Mi
+              cpu: 100m
+          env:
+            - name: CONFIG_FILE_PATH
+              value: ./configs.json
+      serviceAccountName: dashboard

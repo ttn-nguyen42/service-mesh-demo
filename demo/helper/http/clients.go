@@ -33,6 +33,9 @@ func WithTimeout(dur time.Duration) ClientOptioner {
 
 func WithHeader(key string, value string) ClientOptioner {
 	return func(o *Options) {
+		if o.header == nil {
+			o.header = map[string]string{}
+		}
 		o.header[key] = value
 	}
 }

@@ -7,6 +7,6 @@ kubectl create namespace demo
 
 kubectl apply -f locations.yaml \
     -f weather.yaml \
-    -f dashboard.yaml
-
+    -f dashboard.yaml \
+    -f gateway.yaml
 cd -
